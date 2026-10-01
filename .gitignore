@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+#GlycoVision
+#raw and semi-processed data - retrieve with download_data.py
+data/raw/
+data/processed/
+# Do not add models/ or *.joblib here we need those to be commited 

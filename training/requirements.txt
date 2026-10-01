@@ -1,0 +1,8 @@
+pandas
+numpy
+scikit-learn=1.9.1
+shap=0.52.0
+matplotlib
+pyyaml
+joblib
+pytest

@@ -1,0 +1,31 @@
+model_version: clinical-v1
+source: data/raw/pima.csv
+rename:
+  Pregnancies: pregnancies
+  Glucose: glucose
+  BloodPressure: blood_pressure
+  SkinThickness: skin_thickness
+  Insulin: insulin
+  BMI: bmi
+  DiabetesPedigreeFunction: diabetes_pedigree
+  Age: age
+  Outcome: outcome
+target: outcome
+features: [pregnancies, glucose, blood_pressure, skin_thickness,
+           insulin, bmi, diabetes_pedigree, age]
+clean:
+  treat_as_missing:
+    columns: [glucose, blood_pressure, skin_thickness, insulin, bmi]
+    values: [0]
+  impute: median
+split:
+  test_size: 0.2
+  stratify: true
+  random_state: 42
+model:
+  n_estimators: 300
+  max_depth: 8
+  class_weight: balanced
+risk_thresholds:
+  moderate: 0.33
+  high: 0.66
