@@ -1,0 +1,85 @@
+{
+  "model_version": "clinical-v1",
+  "features": [
+    "pregnancies",
+    "glucose",
+    "blood_pressure",
+    "skin_thickness",
+    "insulin",
+    "bmi",
+    "diabetes_pedigree",
+    "age"
+  ],
+  "target": "outcome",
+  "metrics": {
+    "accuracy": 0.721,
+    "roc_auc": 0.827,
+    "precision": 0.58,
+    "recall": 0.741
+  },
+  "risk_thresholds": {
+    "moderate": 0.33,
+    "high": 0.66
+  },
+  "trained_at": "2026-10-21T02:10:07Z",
+  "sklearn_version": "1.9.1",
+  "config_snapshot": {
+    "model_version": "clinical-v1",
+    "source": "data/raw/pima.csv",
+    "rename": {
+      "Pregnancies": "pregnancies",
+      "Glucose": "glucose",
+      "BloodPressure": "blood_pressure",
+      "SkinThickness": "skin_thickness",
+      "Insulin": "insulin",
+      "BMI": "bmi",
+      "DiabetesPedigreeFunction": "diabetes_pedigree",
+      "Age": "age",
+      "Outcome": "outcome"
+    },
+    "target": "outcome",
+    "features": [
+      "pregnancies",
+      "glucose",
+      "blood_pressure",
+      "skin_thickness",
+      "insulin",
+      "bmi",
+      "diabetes_pedigree",
+      "age"
+    ],
+    "clean": {
+      "treat_as_missing": {
+        "columns": [
+          "glucose",
+          "blood_pressure",
+          "skin_thickness",
+          "insulin",
+          "bmi"
+        ],
+        "values": [
+          0
+        ]
+      }
+    },
+    "impute": {
+      "strategy": "median",
+      "add_indicator": true
+    },
+    "split": {
+      "test_size": 0.2,
+      "stratify": true,
+      "random_state": 42
+    },
+    "model": {
+      "n_estimators": 300,
+      "random_state": 42,
+      "max_depth": 8,
+      "class_weight": "balanced"
+    },
+    "risk_thresholds": {
+      "moderate": 0.33,
+      "high": 0.66
+    }
+  }
+}
