@@ -222,3 +222,6 @@ __marimo__/
 data/raw/
 data/processed/
 # Do not add models/ or *.joblib here we need those to be commited 
+
+#dont want db added
+backend/*.db

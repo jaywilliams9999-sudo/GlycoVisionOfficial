@@ -21,7 +21,46 @@
     "moderate": 0.33,
     "high": 0.66
   },
-  "trained_at": "2026-10-21T02:10:07Z",
+  "inputs": {
+    "pregnancies": {
+      "min": 0,
+      "max": 20
+    },
+    "glucose": {
+      "min": 40,
+      "max": 400,
+      "optional": true
+    },
+    "blood_pressure": {
+      "min": 20,
+      "max": 150,
+      "optional": true
+    },
+    "skin_thickness": {
+      "min": 5,
+      "max": 100,
+      "optional": true
+    },
+    "insulin": {
+      "min": 10,
+      "max": 900,
+      "optional": true
+    },
+    "bmi": {
+      "min": 10,
+      "max": 80,
+      "optional": true
+    },
+    "diabetes_pedigree": {
+      "min": 0,
+      "max": 3
+    },
+    "age": {
+      "min": 18,
+      "max": 120
+    }
+  },
+  "trained_at": "2026-10-21T02:46:52Z",
   "sklearn_version": "1.9.1",
   "config_snapshot": {
     "model_version": "clinical-v1",
@@ -80,6 +119,45 @@
     "risk_thresholds": {
       "moderate": 0.33,
       "high": 0.66
+    },
+    "inputs": {
+      "pregnancies": {
+        "min": 0,
+        "max": 20
+      },
+      "glucose": {
+        "min": 40,
+        "max": 400,
+        "optional": true
+      },
+      "blood_pressure": {
+        "min": 20,
+        "max": 150,
+        "optional": true
+      },
+      "skin_thickness": {
+        "min": 5,
+        "max": 100,
+        "optional": true
+      },
+      "insulin": {
+        "min": 10,
+        "max": 900,
+        "optional": true
+      },
+      "bmi": {
+        "min": 10,
+        "max": 80,
+        "optional": true
+      },
+      "diabetes_pedigree": {
+        "min": 0,
+        "max": 3
+      },
+      "age": {
+        "min": 18,
+        "max": 120
+      }
     }
   }
 }

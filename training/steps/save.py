@@ -31,6 +31,8 @@ def write_model_store(model: Pipeline, metrics: dict, cfg: dict) -> Path:
     fitted = list(model.feature_names_in_)
     if fitted != cfg["features"]:
         raise ValueError(f"Pipeline was fitted on {fitted}, but config lists {cfg['features']}.")
+    if set(cfg["inputs"]) != set(cfg["features"]):
+        raise ValueError("Config 'inputs' must have exactly one entry per feature.")
 
     out_dir = REPO_ROOT / "models" / cfg["model_version"]
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -43,6 +45,7 @@ def write_model_store(model: Pipeline, metrics: dict, cfg: dict) -> Path:
         "target": cfg["target"],
         "metrics": metrics,
         "risk_thresholds": cfg["risk_thresholds"],
+        "inputs": cfg["inputs"],
         "trained_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "sklearn_version": sklearn.__version__,
         "config_snapshot": cfg,

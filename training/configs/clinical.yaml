@@ -32,3 +32,14 @@ model:
 risk_thresholds:
   moderate: 0.33
   high: 0.66
+# Valid ranges per feature. Copied into metadata.json: the API rejects values
+# outside them, and the frontend uses them for its form. optional = may be blank.
+inputs:
+  pregnancies:       {min: 0,   max: 20}
+  glucose:           {min: 40,  max: 400, optional: true}
+  blood_pressure:    {min: 20,  max: 150, optional: true}
+  skin_thickness:    {min: 5,   max: 100, optional: true}
+  insulin:           {min: 10,  max: 900, optional: true}
+  bmi:               {min: 10,  max: 80,  optional: true}
+  diabetes_pedigree: {min: 0,   max: 3}
+  age:               {min: 18,  max: 120}

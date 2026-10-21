@@ -18,10 +18,11 @@ def clean(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     #camel case to snake case
     df = df.rename(columns=cfg["rename"])
 
-    #mark impossible values
-    missing = cfg["clean"]["treat_as_missing"]
-    cols = missing["columns"]
-    df[cols] = df[cols].replace(missing["values"], np.nan)
+    #mark impossible values (datasets with impossible values will not be accepted)
+    missing = cfg.get("clean", {}).get("treat_as_missing")
+    if missing:
+        cols = missing["columns"]
+        df[cols] = df[cols].replace(missing["values"], np.nan)
     
     
     return df
