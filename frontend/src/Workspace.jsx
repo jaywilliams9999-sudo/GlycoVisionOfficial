@@ -35,14 +35,14 @@ function PatientPicker({ token, onPick }) {
     e.preventDefault();
     const id = identifier.trim();
     const errs = {};
-    if (!id) errs.identifier = "Enter the patient's MRN.";
+    if (!id) errs.identifier = "Enter the patient's first and last name.";
     else if ((patients ?? []).some((p) => p.identifier.toLowerCase() === id.toLowerCase())) {
-      errs.identifier = "A patient with this MRN already exists. Find them in the list.";
+      errs.identifier = "A patient with this information already exists. Find them in the list.";
     }
     if (!dob) errs.dob = "Enter the date of birth.";
-    else if (dob > todayString()) errs.dob = "Date of birth can't be in the future.";
+    else if (dob > todayString()) errs.dob = "Invalid. DOB can't be in the future.";
     else if (ageFromDob(dob) < 18) errs.dob = "These models are for patients 18 and older.";
-    else if (ageFromDob(dob) > 120) errs.dob = "Check the date of birth.";
+    else if (ageFromDob(dob) > 120) errs.dob = "Check the DOB.";
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
@@ -81,7 +81,7 @@ function PatientPicker({ token, onPick }) {
           <p className="ws-muted">
             {patients.length === 0
               ? "No patients yet. Add the first one."
-              : "No patient matches that MRN."}
+              : "No patient matches that information."}
           </p>
         )}
         {matches.length > 0 && (
@@ -239,7 +239,7 @@ export default function Workspace({ token }) {
     <div className="ws">
       <div className="ws-wrap">
         <header className="ws-head">
-          <h1>Diabetes risk assessment</h1>
+          <h1>Diabetes health risk assessment</h1>
           <p>{patient ? "Enter the patient's latest values." : "Choose a patient to begin."}</p>
         </header>
         {body}
