@@ -15,3 +15,10 @@ class UnknownModelVersion(Exception):
 
 class InvalidInputs(Exception):
     pass
+
+class InvalidCredentials(Exception):
+    pass
+
+
+class AccountLocked(Exception):
+    pass

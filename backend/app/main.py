@@ -6,10 +6,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app import config
-from app.api import assessments, models, patients
+from app.api import assessments, auth, models, patients
 from app.db import models as db_models  # noqa: F401  (registers the tables on Base)
 from app.db.session import Base, engine
-from app.exceptions import AssessmentNotFound, InvalidInputs, PatientNotFound, UnknownModelVersion
+from app.exceptions import (
+    AccountLocked,
+    AssessmentNotFound,
+    InvalidCredentials,
+    InvalidInputs,
+    PatientNotFound,
+    UnknownModelVersion,
+)
 from app.ml.registry import load_registry
 
 
@@ -24,17 +31,32 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="GlycoVision API", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
+app.include_router(auth.router)
 app.include_router(models.router)
 app.include_router(patients.router)
 app.include_router(assessments.router)
 
 # domain exception -> HTTP status; services never know about HTTP
-STATUS_FOR = {PatientNotFound: 404, AssessmentNotFound: 404, UnknownModelVersion: 404, InvalidInputs: 422}
+STATUS_FOR = {
+    PatientNotFound: 404,
+    AssessmentNotFound: 404,
+    UnknownModelVersion: 404,
+    InvalidInputs: 422,
+    InvalidCredentials: 401,
+    AccountLocked: 423,
+}
+
+# shown to the user as-is; one message for wrong username and wrong password
+MESSAGE_FOR = {
+    InvalidCredentials: "Username or password is incorrect.",
+    AccountLocked: "Account locked. Contact an administrator.",
+}
 
 
 def _handler(status: int):
     def handle(request: Request, exc: Exception) -> JSONResponse:
-        return JSONResponse(status_code=status, content={"detail": f"{type(exc).__name__}: {exc}"})
+        detail = MESSAGE_FOR.get(type(exc), f"{type(exc).__name__}: {exc}")
+        return JSONResponse(status_code=status, content={"detail": detail})
     return handle
 
 

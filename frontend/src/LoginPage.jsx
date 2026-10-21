@@ -110,19 +110,19 @@ export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
           <div className="locked" role="alert">
             <strong>{LOCKED_MESSAGE}</strong>
           </div>
-          {MOCK && (
-            <button
-              type="button"
-              className="ghost"
-              onClick={() => {
-                writeAttempts(0);
-                setAttempts(0);
-                setError("");
-              }}
-            >
-              Reset lockout (development only)
-            </button>
-          )}
+          {/* The server decides who is locked. This only clears the browser's copy, so a
+              user an admin has unlocked can sign in; a still-locked one gets 423 again. */}
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => {
+              writeAttempts(0);
+              setAttempts(0);
+              setError("");
+            }}
+          >
+            Back to sign in
+          </button>
         </div>
       </main>
     );

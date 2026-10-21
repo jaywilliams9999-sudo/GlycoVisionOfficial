@@ -3,3 +3,24 @@ body {
   margin: 0;
   background: #f4f7f8;
 }
+
+/* 46px tall: workspace.css sizes the page as 100vh minus this bar */
+.topbar {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #0d5c6e;
+  color: #fff;
+  font: 600 15px/1 system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+.topbar button {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}

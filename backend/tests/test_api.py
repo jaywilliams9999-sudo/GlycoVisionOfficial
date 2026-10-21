@@ -20,8 +20,8 @@ def test_models_lists_both_with_input_ranges(client):
 
 
 @pytest.mark.parametrize("model_version, inputs", [("clinical-v1", CLINICAL), ("screening-v1", SCREENING)])
-def test_assessment_scores_explains_and_saves(client, patient_id, model_version, inputs):
-    response = client.post("/assessments", json={"patient_id": patient_id, "model_version": model_version, "inputs": inputs})
+def test_assessment_scores_explains_and_saves(client, auth, patient_id, model_version, inputs):
+    response = client.post("/assessments", json={"patient_id": patient_id, "model_version": model_version, "inputs": inputs}, headers=auth)
     assert response.status_code == 201
     body = response.json()
 
@@ -35,13 +35,13 @@ def test_assessment_scores_explains_and_saves(client, patient_id, model_version,
     total = base + sum(c["contribution"] for c in body["shap_values"])
     assert total == pytest.approx(body["risk_probability"], abs=0.01)
 
-    assert client.get(f"/assessments/{body['id']}").json() == body
+    assert client.get(f"/assessments/{body['id']}", headers=auth).json() == body
 
 
-def test_timeline_returns_patient_assessments_oldest_first(client, patient_id):
+def test_timeline_returns_patient_assessments_oldest_first(client, auth, patient_id):
     for _ in range(2):
-        client.post("/assessments", json={"patient_id": patient_id, "model_version": "clinical-v1", "inputs": CLINICAL})
-    timeline = client.get(f"/patients/{patient_id}/assessments").json()
+        client.post("/assessments", json={"patient_id": patient_id, "model_version": "clinical-v1", "inputs": CLINICAL}, headers=auth)
+    timeline = client.get(f"/patients/{patient_id}/assessments", headers=auth).json()
     assert len(timeline) == 2
     assert timeline[0]["created_at"] <= timeline[1]["created_at"]
 
@@ -50,21 +50,21 @@ def test_timeline_returns_patient_assessments_oldest_first(client, patient_id):
     ({"glucose": 900}, "outside"),
     ({"age": None}, "age is required"),
 ])
-def test_invalid_inputs_are_rejected(client, patient_id, change, message):
+def test_invalid_inputs_are_rejected(client, auth, patient_id, change, message):
     response = client.post("/assessments", json={
         "patient_id": patient_id, "model_version": "clinical-v1", "inputs": {**CLINICAL, **change},
-    })
+    }, headers=auth)
     assert response.status_code == 422
     assert message in response.json()["detail"]
 
 
-def test_missing_feature_is_rejected(client, patient_id):
+def test_missing_feature_is_rejected(client, auth, patient_id):
     inputs = {k: v for k, v in CLINICAL.items() if k != "bmi"}
-    response = client.post("/assessments", json={"patient_id": patient_id, "model_version": "clinical-v1", "inputs": inputs})
+    response = client.post("/assessments", json={"patient_id": patient_id, "model_version": "clinical-v1", "inputs": inputs}, headers=auth)
     assert response.status_code == 422
 
 
-def test_unknown_patient_and_model_are_404(client, patient_id):
-    assert client.post("/assessments", json={"patient_id": 99999, "model_version": "clinical-v1", "inputs": CLINICAL}).status_code == 404
-    assert client.post("/assessments", json={"patient_id": patient_id, "model_version": "nope", "inputs": CLINICAL}).status_code == 404
-    assert client.get("/patients/99999").status_code == 404
+def test_unknown_patient_and_model_are_404(client, auth, patient_id):
+    assert client.post("/assessments", json={"patient_id": 99999, "model_version": "clinical-v1", "inputs": CLINICAL}, headers=auth).status_code == 404
+    assert client.post("/assessments", json={"patient_id": patient_id, "model_version": "nope", "inputs": CLINICAL}, headers=auth).status_code == 404
+    assert client.get("/patients/99999", headers=auth).status_code == 404

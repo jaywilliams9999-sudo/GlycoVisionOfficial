@@ -1,9 +1,9 @@
-// The backend has no auth yet, so the token is accepted and ignored for now.
-import * as client from './client'
-import type { AssessmentCreate, PatientCreate } from './types'
-
-export const listModels = (_token?: string) => client.getModels()
-export const listPatients = (_token?: string) => client.listPatients()
-export const createPatient = (_token: string | undefined, body: PatientCreate) => client.createPatient(body)
-export const createAssessment = (_token: string | undefined, body: AssessmentCreate) => client.createAssessment(body)
-export const listAssessments = (_token: string | undefined, patientId: number) => client.getTimeline(patientId)
+// The teammate's components import from "./api" under these names.
+// (Workspace calls listModels(token); the extra argument is ignored, the model list is public.)
+export {
+  createAssessment,
+  createPatient,
+  getModels as listModels,
+  getTimeline as listAssessments,
+  listPatients,
+} from './client'

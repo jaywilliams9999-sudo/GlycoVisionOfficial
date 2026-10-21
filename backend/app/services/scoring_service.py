@@ -38,11 +38,13 @@ def risk_level(probability: float, thresholds: dict) -> str:
     return "low"
 
 
-def create_assessment(db: Session, registry: dict[str, ModelEntry], request: AssessmentCreate) -> Assessment:
+def create_assessment(
+    db: Session, registry: dict[str, ModelEntry], request: AssessmentCreate, clinician_id: int
+) -> Assessment:
     entry = registry.get(request.model_version)
     if entry is None:
         raise UnknownModelVersion(request.model_version)
-    if patient_repo.get(db, request.patient_id) is None:
+    if patient_repo.get(db, request.patient_id, clinician_id) is None:
         raise PatientNotFound(request.patient_id)
 
     metadata = entry.metadata
