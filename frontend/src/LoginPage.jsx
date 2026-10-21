@@ -5,6 +5,8 @@ const MOCK = import.meta.env.DEV && import.meta.env.VITE_MOCK_AUTH === "true";
 const MAX_ATTEMPTS = 5;
 const STORAGE_KEY = "login_failed_attempts";
 const LOCKED_MESSAGE = "Account Locked. Contact Administrator.";
+const ACCOUNT_HELP_MESSAGE =
+  "Please contact your system administrator for account registration or recovery.";
 
 function readAttempts() {
   try {
@@ -18,7 +20,7 @@ function writeAttempts(n) {
     if (n > 0) localStorage.setItem(STORAGE_KEY, String(n));
     else localStorage.removeItem(STORAGE_KEY);
   } catch {
-    
+
   }
 }
 
@@ -28,6 +30,7 @@ export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(readAttempts);
+  const [showHelp, setShowHelp] = useState(false);
 
   const locked = attempts >= MAX_ATTEMPTS;
 
@@ -93,12 +96,28 @@ export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
       writeAttempts(0);
       onLogin({ token: data.access_token, name: data.user?.name ?? username.trim() });
     } catch {
-      
+
       setError("Couldn't reach the sign-in service. Check your connection and try again.");
       setPassword("");
     } finally {
       setLoading(false);
     }
+  }
+
+  // No self-registration: accounts are created and recovered by an administrator (UC1, UC2 1.b).
+  if (showHelp) {
+    return (
+      <main className="lg">
+        <style>{CSS}</style>
+        <div className="lg-card">
+          <h1>Account help</h1>
+          <p className="notice" role="status">{ACCOUNT_HELP_MESSAGE}</p>
+          <button type="button" className="ghost" onClick={() => setShowHelp(false)}>
+            Back to sign in
+          </button>
+        </div>
+      </main>
+    );
   }
 
   if (locked) {
@@ -159,6 +178,9 @@ export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
         <button type="submit" disabled={loading}>
           {loading ? "Signing in…" : "Sign in"}
         </button>
+        <button type="button" className="link" onClick={() => setShowHelp(true)}>
+          Need an account or forgot your password?
+        </button>
       </form>
     </main>
   );
@@ -182,4 +204,5 @@ const CSS = `
 .lg button{width:100%;height:46px;margin-top:20px;border:0;border-radius:6px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
 .lg button.ghost{background:transparent;border:1px solid #9aa9b0;color:var(--ink)}
 .lg button:disabled{opacity:.6;cursor:progress}
+.lg button.link{height:auto;margin-top:12px;padding:0;background:none;color:var(--accent);font-weight:500;text-decoration:underline}
 `;
