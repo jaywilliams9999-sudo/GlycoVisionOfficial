@@ -2,9 +2,6 @@ import { useRef, useState } from "react";
 import { createAssessment } from "./api";
 import { HINTS, MODEL_INFO, UNITS, choicesFor, defaultsFor, labelFor, modelName } from "./fields";
 
-// The form is built from what the backend says each model needs (GET /models),
-// so a new model or feature appears here without changing this file.
-
 function validate(model, values) {
   const errors = {};
   for (const f of model.features) {
@@ -67,7 +64,7 @@ export default function AssessmentForm({ token, patient, models, onResult }) {
   const [version, setVersion] = useState(models[0].model_version);
   const [values, setValues] = useState(() => defaultsFor(patient));
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // idle | saving | error
+  const [status, setStatus] = useState("idle");
   const [apiError, setApiError] = useState("");
   const formRef = useRef(null);
 
@@ -103,7 +100,7 @@ export default function AssessmentForm({ token, patient, models, onResult }) {
       setTimeout(() => formRef.current?.querySelector('[aria-invalid="true"]')?.focus(), 0);
       return;
     }
-    // Every feature must be present. Blank optional ones are sent as null.
+    
     const inputs = Object.fromEntries(
       model.features.map((f) => [f, (values[f] ?? "") === "" ? null : Number(values[f])])
     );

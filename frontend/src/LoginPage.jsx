@@ -1,18 +1,11 @@
 import { useState } from "react";
 
-// Development-only sign-in so you can build the UI before the backend exists.
-// It can only turn on in `npm run dev` (import.meta.env.DEV is false in
-// production builds) and only when frontend/.env.local contains
-// VITE_MOCK_AUTH=true. Sign in with demo / demo.
 const MOCK = import.meta.env.DEV && import.meta.env.VITE_MOCK_AUTH === "true";
 
 const MAX_ATTEMPTS = 5;
 const STORAGE_KEY = "login_failed_attempts";
 const LOCKED_MESSAGE = "Account Locked. Contact Administrator.";
 
-// The counter survives a page refresh, but it only lives in this browser, so
-// it is a convenience, not security. The real lockout must be enforced by the
-// backend (see the note about 423 / 429 below).
 function readAttempts() {
   try {
     return Number(localStorage.getItem(STORAGE_KEY)) || 0;
@@ -25,22 +18,10 @@ function writeAttempts(n) {
     if (n > 0) localStorage.setItem(STORAGE_KEY, String(n));
     else localStorage.removeItem(STORAGE_KEY);
   } catch {
-    /* storage unavailable: the counter just resets on refresh */
+    
   }
 }
 
-/**
- * LoginPage
- * Props
- *  - apiUrl:  base URL of your backend (default "/api")
- *  - onLogin: ({ token, name }) => void, called after a successful sign-in
- *  - notice:  optional message shown above the form (e.g. signed out for inactivity)
- *
- * Expected response from POST /auth/login:
- *  200 { "access_token": "…", "user": { "name": "Dr. Rivera" } }
- *  400/401/403  wrong username or password (counts as a failed attempt)
- *  423 or 429   the account is locked on the server (shows the locked message)
- */
 export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -112,7 +93,7 @@ export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
       writeAttempts(0);
       onLogin({ token: data.access_token, name: data.user?.name ?? username.trim() });
     } catch {
-      // Network problems are not wrong-password attempts, so they don't count.
+      
       setError("Couldn't reach the sign-in service. Check your connection and try again.");
       setPassword("");
     } finally {
