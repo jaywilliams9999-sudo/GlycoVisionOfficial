@@ -1,0 +1,68 @@
+# Runs on every push and pull request. A red X on a commit means one of these failed.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend tests (${{ matrix.db }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false        # show both results even if one database fails
+      matrix:
+        db: [sqlite, postgres]
+
+    # a throwaway PostgreSQL for the postgres run (ignored by the sqlite run)
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: gvtest
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d gvtest"
+          --health-interval 2s --health-timeout 3s --health-retries 15
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - run: pip install -r requirements.txt
+
+      - name: pytest
+        env:
+          # empty for sqlite, so conftest.py falls back to a temporary SQLite file
+          TEST_DATABASE_URL: ${{ matrix.db == 'postgres' && 'postgresql+psycopg://postgres:test@localhost:5432/gvtest' || '' }}
+        run: python -m pytest -q
+
+  frontend:
+    name: Frontend lint and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build     # also type-checks (tsc -b)
