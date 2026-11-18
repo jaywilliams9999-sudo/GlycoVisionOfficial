@@ -150,9 +150,12 @@ export default function LoginPage({ apiUrl = "/api", onLogin, notice = "" }) {
   return (
     <main className="lg">
       <style>{CSS}</style>
+      <div className="logo-text">
+  <strong>GlycoVision</strong>
+</div>
       <form className="lg-card" onSubmit={submit} noValidate>
         <h1>Sign in</h1>
-        <p className="sub">Diabetes risk assessment. For authorized clinical staff only.</p>
+        <p className="sub">Diabetes Risk Assessment. For authorized clinical staff only.</p>
 
         {notice && <p className="notice" role="status">{notice}</p>}
         {MOCK && (
@@ -193,6 +196,9 @@ const CSS = `
 .lg *{box-sizing:border-box}
 .lg-card{width:100%;max-width:380px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:28px}
 .lg h1{font-size:1.5rem;margin:0 0 4px}
+.logo-text{text-align:center;margin:20px 0;padding:4px 20px;border:2px solid #0d5c6e;border-radius:12px;background:#0d5c6e;color:#fff}
+.logo-text strong{display:block;font-size:4.5rem}
+.logo-text span{color:#5b6b73;font-size:.9rem}
 .sub{margin:0 0 20px;color:var(--mute);font-size:.95rem}
 .lg label{display:block;font-size:.9rem;font-weight:550;margin:14px 0 4px}
 .lg input{width:100%;height:44px;padding:0 12px;border:1px solid #9aa9b0;border-radius:6px;font:inherit}
