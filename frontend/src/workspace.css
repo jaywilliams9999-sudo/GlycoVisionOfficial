@@ -94,3 +94,23 @@
   .ws-grid{grid-template-columns:1fr}
   .ws-results{position:static}
 }
+.ws-charts{margin:4px 0 10px}
+.ws-chart{margin:10px 0 0}
+.ws-chart figcaption{font-size:.85rem;font-weight:600;margin-bottom:2px}
+.ws-chart svg{display:block;width:100%;height:auto;overflow:visible}
+.ws-chart .band.low{fill:var(--ok);opacity:.08}.ws-chart .band.moderate{fill:#d9a21b;opacity:.12}.ws-chart .band.high{fill:var(--bad);opacity:.08}
+.ws-chart .band-label{font-size:10px;font-weight:600}
+.ws-chart .band-label.low{fill:var(--ok)}.ws-chart .band-label.moderate{fill:var(--warn)}.ws-chart .band-label.high{fill:var(--bad)}
+.ws-chart .grid{stroke:var(--line);stroke-width:1}
+.ws-chart .tick{font-size:10px;fill:var(--mute);font-variant-numeric:tabular-nums}
+.ws-chart .line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
+.ws-chart .pt{cursor:pointer;outline:none}
+.ws-chart .hit{fill:transparent}
+.ws-chart .dot{stroke:#fff;stroke-width:2}
+.ws-chart .pt.low .dot{fill:var(--ok)}.ws-chart .pt.moderate .dot{fill:#d9a21b}.ws-chart .pt.high .dot{fill:var(--bad)}
+.ws-chart .pt.on .dot{stroke:var(--accent);stroke-width:3}
+.ws-chart .pt:hover .dot{stroke:var(--ink)}
+.ws-chart .pt:focus-visible .hit{fill:none;stroke:#7fc4d4;stroke-width:3}
+.ws-results h2[tabindex="-1"]:focus{outline:none}
+.ws-patient .ws-actions{flex-direction:row;flex-wrap:wrap;gap:8px}
+.ws-grid.results-only{grid-template-columns:minmax(0,760px);justify-content:center}

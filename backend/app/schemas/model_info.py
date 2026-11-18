@@ -12,3 +12,4 @@ class ModelOut(BaseModel):
     features: list[str]
     inputs: dict[str, InputSpec]
     metrics: dict[str, float]
+    risk_thresholds: dict[str, float]  # {"moderate": ..., "high": ...}, as scoring uses them

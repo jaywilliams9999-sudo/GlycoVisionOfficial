@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_clinician, get_db
-from app.exceptions import PatientNotFound
+from app.exceptions import DuplicatePatient, PatientNotFound
 from app.repositories import assessment_repo, patient_repo
 from app.schemas.assessment import AssessmentOut
 from app.schemas.patient import PatientCreate, PatientOut
@@ -12,6 +12,9 @@ router = APIRouter(prefix="/patients", tags=["patients"])
 
 @router.post("", response_model=PatientOut, status_code=201)
 def create_patient(body: PatientCreate, db: Session = Depends(get_db), clinician=Depends(get_current_clinician)):
+    # body.identifier is already trimmed by PatientCreate
+    if patient_repo.find_by_identifier(db, clinician.id, body.identifier) is not None:
+        raise DuplicatePatient(body.identifier)
     return patient_repo.create(db, clinician.id, body.identifier, body.date_of_birth)
 
 

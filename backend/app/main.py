@@ -12,6 +12,7 @@ from app.db.session import Base, engine
 from app.exceptions import (
     AccountLocked,
     AssessmentNotFound,
+    DuplicatePatient,
     InvalidCredentials,
     InvalidInputs,
     PatientNotFound,
@@ -36,12 +37,12 @@ app.include_router(models.router)
 app.include_router(patients.router)
 app.include_router(assessments.router)
 
-# domain exception -> HTTP status; services never know about HTTP
 STATUS_FOR = {
     PatientNotFound: 404,
     AssessmentNotFound: 404,
     UnknownModelVersion: 404,
     InvalidInputs: 422,
+    DuplicatePatient: 409,
     InvalidCredentials: 401,
     AccountLocked: 423,
 }
@@ -50,8 +51,8 @@ STATUS_FOR = {
 MESSAGE_FOR = {
     InvalidCredentials: "Username or password is incorrect.",
     AccountLocked: "Account locked. Contact an administrator.",
+    DuplicatePatient: "A patient with this MRN already exists. Find them in the list.",
 }
-
 
 def _handler(status: int):
     def handle(request: Request, exc: Exception) -> JSONResponse:

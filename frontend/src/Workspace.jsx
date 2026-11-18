@@ -35,9 +35,9 @@ function PatientPicker({ token, onPick }) {
     e.preventDefault();
     const id = identifier.trim();
     const errs = {};
-    if (!id) errs.identifier = "Enter the patient's first and last name.";
+    if (!id) errs.identifier = "Enter the patient's MRN.";
     else if ((patients ?? []).some((p) => p.identifier.toLowerCase() === id.toLowerCase())) {
-      errs.identifier = "A patient with this information already exists. Find them in the list.";
+      errs.identifier = "A patient with this MRN already exists. Find them in the list.";
     }
     if (!dob) errs.dob = "Enter the date of birth.";
     else if (dob > todayString()) errs.dob = "Invalid. DOB can't be in the future.";
@@ -146,6 +146,7 @@ export default function Workspace({ token }) {
   const [history, setHistory] = useState([]);
   const [historyError, setHistoryError] = useState("");
   const [shown, setShown] = useState(null);
+  const [resultsOnly, setResultsOnly] = useState(false);
 
   const loadModels = useCallback(() => {
     setModelsError("");
@@ -201,11 +202,24 @@ export default function Workspace({ token }) {
               Born {formatDob(patient.date_of_birth)} · {ageFromDob(patient.date_of_birth)} years
             </span>
           </div>
-          <button type="button" className="ws-ghost" onClick={() => setPatient(null)}>
-            Change patient
-          </button>
+          <div className="ws-actions">
+            <button
+              type="button"
+              className="ws-ghost"
+              aria-controls="ws-form"
+              aria-expanded={!resultsOnly}
+              onClick={() => setResultsOnly((r) => !r)}
+            >
+              {resultsOnly ? "Show form" : "Results only"}
+            </button>
+            <button type="button" className="ws-ghost" onClick={() => setPatient(null)}>
+              Change patient
+            </button>
+          </div>
         </div>
-        <div className="ws-grid">
+        <div className={`ws-grid${resultsOnly ? " results-only" : ""}`}>
+          {/* hidden, not removed, so half-typed values survive a peek at the results */}
+          <div id="ws-form" hidden={resultsOnly}>
           <AssessmentForm
             key={patient.id}
             token={token}
@@ -221,8 +235,9 @@ export default function Workspace({ token }) {
                   0
                 );
               }
-            }}
+             }}
           />
+          </div>
           <ResultsPanel
             shown={shown}
             history={history}
@@ -240,7 +255,13 @@ export default function Workspace({ token }) {
       <div className="ws-wrap">
         <header className="ws-head">
           <h1>Diabetes health risk assessment</h1>
-          <p>{patient ? "Enter the patient's latest values." : "Choose a patient to begin."}</p>
+          <p>
+            {!patient
+              ? "Choose a patient to begin."
+              : resultsOnly
+                ? "Reviewing this patient's saved results."
+                : "Enter the patient's latest values."}
+          </p>
         </header>
         {body}
       </div>

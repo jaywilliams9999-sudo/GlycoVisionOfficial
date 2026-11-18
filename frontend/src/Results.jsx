@@ -1,6 +1,8 @@
+import { useRef } from "react";
 import { LEVELS, displayValue, formatDateTime, labelFor, modelName } from "./fields";
+import RiskChart from "./RiskChart";
 
-function Result({ a, model }) {
+function Result({ a, model, headingRef }) {
   const pct = Math.round(a.risk_probability * 100);
 
   const drivers = a.shap_values.filter((c) => Math.abs(c.contribution) >= 0.0005).slice(0, 8);
@@ -8,7 +10,7 @@ function Result({ a, model }) {
 
   return (
     <div>
-      <h2>Result</h2>
+      <h2 ref={headingRef} tabIndex={-1}>Result</h2>
       <p className="ws-meta">
         {formatDateTime(a.created_at)} · {modelName(a.model_version)} model ({a.model_version})
       </p>
@@ -67,7 +69,7 @@ function Result({ a, model }) {
   );
 }
 
-function Timeline({ history, selectedId, onSelect, error }) {
+function Timeline({ history, modelsByVersion, selectedId, onSelect, error }) {
   const rows = [...history].reverse(); 
   const mixed = new Set(history.map((h) => h.model_version)).size > 1;
   return (
@@ -80,6 +82,14 @@ function Timeline({ history, selectedId, onSelect, error }) {
       )}
       {!error && rows.length === 0 && (
         <p className="ws-muted">No assessments yet for this patient.</p>
+      )}
+      {!error && (
+        <RiskChart
+          history={history}
+          modelsByVersion={modelsByVersion}
+          selectedId={selectedId}
+          onSelect={onSelect}
+        />
       )}
       {rows.length > 0 && (
         <ul>
@@ -109,10 +119,26 @@ function Timeline({ history, selectedId, onSelect, error }) {
 }
 
 export default function ResultsPanel({ shown, history, modelsByVersion, onSelect, historyError }) {
+  const headingRef = useRef(null);
+
+  // The result sits above the timeline, so on a short screen picking a past result
+  // changed something off-screen and looked like nothing happened. Bring it into view
+  // and move focus there so keyboard and screen-reader users land on it too.
+  function select(a) {
+    onSelect(a);
+    requestAnimationFrame(() => {
+      const h = headingRef.current;
+      if (!h) return;
+      const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      h.scrollIntoView({ behavior: calm ? "auto" : "smooth", block: "nearest" });
+      h.focus({ preventScroll: true });
+    });
+  }
+
   return (
     <aside className="ws-card ws-results" aria-live="polite">
       {shown ? (
-        <Result a={shown} model={modelsByVersion[shown.model_version]} />
+        <Result a={shown} model={modelsByVersion[shown.model_version]} headingRef={headingRef} />
       ) : (
         <div>
           <h2>Result</h2>
@@ -124,8 +150,9 @@ export default function ResultsPanel({ shown, history, modelsByVersion, onSelect
       )}
       <Timeline
         history={history}
+        modelsByVersion={modelsByVersion}
         selectedId={shown?.id}
-        onSelect={onSelect}
+        onSelect={select}
         error={historyError}
       />
     </aside>

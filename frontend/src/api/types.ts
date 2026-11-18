@@ -11,6 +11,8 @@ export interface ModelInfo {
   features: string[]
   inputs: Record<string, InputSpec>
   metrics: Record<string, number>
+  // score cut-offs: below moderate = low, at or above high = high
+  risk_thresholds: { moderate: number; high: number }
 }
 
 export interface Patient {

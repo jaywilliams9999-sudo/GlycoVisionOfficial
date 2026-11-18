@@ -18,6 +18,13 @@ def test_models_lists_both_with_input_ranges(client):
     assert set(models) == {"clinical-v1", "screening-v1"}
     assert models["clinical-v1"]["inputs"]["insulin"]["optional"] is True
 
+def test_models_list_includes_risk_thresholds_from_metadata(client):
+    # the frontend shades the timeline graph with these, so they must match what scoring uses
+    for m in client.get("/models").json():
+        expected = client.app.state.registry[m["model_version"]].metadata["risk_thresholds"]
+        assert m["risk_thresholds"] == expected
+        assert 0 < m["risk_thresholds"]["moderate"] < m["risk_thresholds"]["high"] < 1
+
 
 @pytest.mark.parametrize("model_version, inputs", [("clinical-v1", CLINICAL), ("screening-v1", SCREENING)])
 def test_assessment_scores_explains_and_saves(client, auth, patient_id, model_version, inputs):
