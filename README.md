@@ -79,6 +79,34 @@ cd backend
 pytest
 ```
 
+To run the same tests against PostgreSQL instead of SQLite, point `TEST_DATABASE_URL` at an empty database. The tests wipe it.
+
+```bash
+docker run -d --rm --name gv-test-pg -e POSTGRES_PASSWORD=test -e POSTGRES_DB=gvtest -p 5433:5432 postgres:17-alpine
+TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:5433/gvtest pytest
+docker stop gv-test-pg
+```
+
+## Run with Docker (PostgreSQL)
+
+Runs the whole app (PostgreSQL, the API and the built frontend) with one command. You need Docker Desktop running.
+
+```bash
+cp .env.example .env        # then replace both values in .env
+docker compose up --build -d
+docker compose exec backend python -m scripts.clinicians add <username> "<Full Name>"
+```
+
+Open `http://localhost:8080`. nginx serves the frontend and forwards `/api/*` to the backend, so only port 8080 is exposed.
+
+| Command | What it does |
+|---|---|
+| `docker compose logs -f backend` | Follow the API logs |
+| `docker compose down` | Stop everything. Data is kept in the `pgdata` volume |
+| `docker compose down -v` | Stop and **delete all data** |
+| `docker compose up --build -d` | Rebuild after code changes |
+
+
 ## Configuration
 
 The backend reads these environment variables. The defaults are for local development only.

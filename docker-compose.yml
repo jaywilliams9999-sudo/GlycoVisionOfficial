@@ -1,0 +1,41 @@
+# GlycoVision with PostgreSQL (NFR-6).
+#   copy .env.example to .env and fill it in, then:
+#   docker compose up --build        -> http://localhost:8080
+#   docker compose exec backend python -m scripts.clinicians add <username> "<Full Name>"
+name: glycovision
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: glycovision
+      POSTGRES_USER: glycovision
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # survives "docker compose down"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U glycovision -d glycovision"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://glycovision:${POSTGRES_PASSWORD}@db:5432/glycovision
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+    depends_on:
+      db:
+        condition: service_healthy   # wait until Postgres accepts connections
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

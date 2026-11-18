@@ -11,3 +11,4 @@ pytest
 httpx
 bcrypt
 PyJWT
+psycopg[binary]
