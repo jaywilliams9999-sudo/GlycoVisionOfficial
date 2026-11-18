@@ -13,6 +13,9 @@ export interface ModelInfo {
   metrics: Record<string, number>
   // score cut-offs: below moderate = low, at or above high = high
   risk_thresholds: { moderate: number; high: number }
+  // false once a newer version of the same model exists; kept so old results still display
+  active: boolean
+  replaced_by: string | null
 }
 
 export interface Patient {

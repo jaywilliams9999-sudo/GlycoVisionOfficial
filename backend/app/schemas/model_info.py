@@ -13,3 +13,5 @@ class ModelOut(BaseModel):
     inputs: dict[str, InputSpec]
     metrics: dict[str, float]
     risk_thresholds: dict[str, float]  # {"moderate": ..., "high": ...}, as scoring uses them
+    active: bool  # False once a newer version of the same model exists
+    replaced_by: str | None = None

@@ -1,4 +1,4 @@
-model_version: screening-v1
+model_version: screening-v2
 source: data/raw/brfss.csv
 rename:
   Diabetes_binary: diabetes
@@ -36,9 +36,13 @@ model:
   max_depth: 8
   class_weight: balanced
   n_jobs: -1
-risk_thresholds:
-  moderate: 0.33
-  high: 0.66
+# Risk cut-offs are chosen from cross-validated training scores (steps/thresholds.py):
+#   Low/Moderate line: still flags low_recall of diabetic patients
+#   Moderate/High line: keeps high_specificity of non-diabetic patients below it
+risk_policy:
+  low_recall: 0.90
+  high_specificity: 0.90
+  cv_folds: 5
 
 # Valid ranges per feature, copied into metadata.json (see clinical.yaml).
 # BRFSS codes: 0/1 = no/yes; general_health 1 (excellent) - 5 (poor);

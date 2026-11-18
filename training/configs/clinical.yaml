@@ -1,4 +1,4 @@
-model_version: clinical-v1
+model_version: clinical-v2
 source: data/raw/pima.csv
 rename:
   Pregnancies: pregnancies
@@ -29,9 +29,13 @@ model:
   random_state: 42
   max_depth: 8
   class_weight: balanced
-risk_thresholds:
-  moderate: 0.33
-  high: 0.66
+# Risk cut-offs are chosen from cross-validated training scores (steps/thresholds.py):
+#   Low/Moderate line: still flags low_recall of diabetic patients
+#   Moderate/High line: keeps high_specificity of non-diabetic patients below it
+risk_policy:
+  low_recall: 0.90
+  high_specificity: 0.90
+  cv_folds: 5
 # Valid ranges per feature. Copied into metadata.json: the API rejects values
 # outside them, and the frontend uses them for its form. optional = may be blank.
 inputs:

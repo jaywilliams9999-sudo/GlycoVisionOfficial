@@ -37,7 +37,7 @@ function ModelChart({ version, points, thresholds, selectedId, onSelect }) {
     <figure className="ws-chart">
       <figcaption>
         {modelName(version)} score over time
-        <span className="ws-muted"> · {points.length} assessments</span>
+        <span className="ws-muted"> · {version} · {points.length} assessments</span>
       </figcaption>
       <svg
         viewBox={`0 0 ${W} ${H}`}

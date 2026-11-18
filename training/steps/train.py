@@ -5,6 +5,14 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 
+def build_pipeline(cfg: dict) -> Pipeline:
+    """The unfitted imputer + random forest pipeline described by the config."""
+    return Pipeline(steps=[
+        ("imputer", SimpleImputer(**cfg["impute"])),
+        ("rf", RandomForestClassifier(**cfg["model"])),
+    ])
+
+
 def fit_model(X_train: pd.DataFrame, y_train: pd.Series, cfg: dict) -> Pipeline:
     """
     Build and fit an imputer + random forest pipeline.
@@ -20,12 +28,6 @@ def fit_model(X_train: pd.DataFrame, y_train: pd.Series, cfg: dict) -> Pipeline:
     Returns:
         Pipeline: Fitted pipeline with steps "imputer" and "rf".
     """
-    imputer = SimpleImputer(**cfg["impute"])
-
-    rf = RandomForestClassifier(**cfg["model"])
-
-    pipeline = Pipeline(steps=[("imputer", imputer), ("rf", rf)])
-
+    pipeline = build_pipeline(cfg)
     pipeline.fit(X_train, y_train)
-
     return pipeline

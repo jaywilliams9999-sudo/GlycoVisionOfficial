@@ -224,7 +224,7 @@ export default function Workspace({ token }) {
             key={patient.id}
             token={token}
             patient={patient}
-            models={models}
+            models={models.filter((m) => m.active)} // replaced versions only show old results
             onResult={(a) => {
               setShown(a);
               setHistory((h) => [...h, a]);

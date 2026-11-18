@@ -16,6 +16,10 @@ class UnknownModelVersion(Exception):
 class InvalidInputs(Exception):
     pass
 
+
+class ModelReplaced(Exception):
+    pass
+
 class DuplicatePatient(Exception):
     pass
 

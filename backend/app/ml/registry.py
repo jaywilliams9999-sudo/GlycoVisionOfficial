@@ -14,6 +14,31 @@ class ModelEntry:
     model: Pipeline
     explainer: shap.TreeExplainer
     metadata: dict
+    # set by load_registry: None for the newest version of its family, else the newer version
+    replaced_by: str | None = None
+
+    @property
+    def active(self) -> bool:
+        """Only the newest version takes new assessments; older ones stay for saved results."""
+        return self.replaced_by is None
+
+
+def _family_and_number(version: str) -> tuple[str, int]:
+    """"clinical-v12" -> ("clinical", 12)."""
+    family, _, number = version.rpartition("-v")
+    if not family or not number.isdigit():
+        raise RuntimeError(f"Model version {version!r} must look like <name>-v<number>.")
+    return family, int(number)
+
+
+def latest_by_family(versions: list[str]) -> dict[str, str]:
+    """The highest-numbered version of each model family, compared as numbers (v10 > v9)."""
+    latest: dict[str, str] = {}
+    for version in versions:
+        family, number = _family_and_number(version)
+        if family not in latest or number > _family_and_number(latest[family])[1]:
+            latest[family] = version
+    return latest
 
 
 def load_registry(model_dir: Path) -> dict[str, ModelEntry]:
@@ -46,4 +71,9 @@ def load_registry(model_dir: Path) -> dict[str, ModelEntry]:
 
     if not registry:
         raise RuntimeError(f"No models found in {model_dir}.")
+
+    latest = latest_by_family(list(registry))
+    for version, entry in registry.items():
+        newest = latest[_family_and_number(version)[0]]
+        entry.replaced_by = None if newest == version else newest
     return registry

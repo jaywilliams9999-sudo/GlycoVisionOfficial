@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 from steps.load import REPO_ROOT
 
 
-def write_model_store(model: Pipeline, metrics: dict, cfg: dict) -> Path:
+def write_model_store(model: Pipeline, metrics: dict, thresholds: dict, cfg: dict) -> Path:
     """
     Save the fitted pipeline and its metadata to models/<model_version>/.
 
@@ -21,6 +21,7 @@ def write_model_store(model: Pipeline, metrics: dict, cfg: dict) -> Path:
     Args:
         model (Pipeline): Fitted pipeline from fit_model().
         metrics (dict): Test-set metrics from score().
+        thresholds (dict): Risk cut-offs from choose_thresholds().
         cfg (dict): The training configuration dictionary.
 
     Returns:
@@ -44,7 +45,7 @@ def write_model_store(model: Pipeline, metrics: dict, cfg: dict) -> Path:
         "features": cfg["features"],
         "target": cfg["target"],
         "metrics": metrics,
-        "risk_thresholds": cfg["risk_thresholds"],
+        "risk_thresholds": thresholds,
         "inputs": cfg["inputs"],
         "trained_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "sklearn_version": sklearn.__version__,

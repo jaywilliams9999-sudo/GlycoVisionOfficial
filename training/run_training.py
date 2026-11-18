@@ -9,6 +9,7 @@ from steps.load import load_raw
 from steps.clean import clean
 from steps.split import split
 from steps.train import fit_model
+from steps.thresholds import choose_thresholds
 from steps.evaluate import score
 from steps.save import write_model_store
 
@@ -22,10 +23,12 @@ def main() -> None:
 
     df = clean(load_raw(cfg), cfg)
     X_train, X_test, y_train, y_test = split(df, cfg)
+    thresholds = choose_thresholds(X_train, y_train, cfg)
     model = fit_model(X_train, y_train, cfg)
-    metrics = score(model, X_test, y_test)
-    out_dir = write_model_store(model, metrics, cfg)
+    metrics = score(model, X_test, y_test, thresholds)
+    out_dir = write_model_store(model, metrics, thresholds, cfg)
 
+    print(f"{cfg['model_version']} risk cut-offs: {thresholds}")
     print(f"{cfg['model_version']} test metrics: {json.dumps(metrics)}")
     print(f"Saved to {out_dir}")
 

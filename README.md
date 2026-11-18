@@ -157,6 +157,19 @@ python run_training.py configs/clinical.yaml     # or configs/screening.yaml
 
 **Always pass a config file**, or training won't run. The new model is written to `models/<model_version>/`. The backend refuses to start if a model was trained with a different scikit-learn version than the one installed, so keep `scikit-learn` pinned to the same version in both `requirements.txt` files. Raw data in `data/` is git-ignored; the `models/` folder is not.
 
+### How the risk cut-offs are chosen
+
+The Low/Moderate/High cut-offs are not typed in. Training picks them from cross-validated scores on the training split, following `risk_policy` in the config:
+
+- **Low/Moderate line:** the highest score that still flags 90% of patients with diabetes (`low_recall`), so a Low result rarely belongs to someone who has it.
+- **Moderate/High line:** the lowest score that keeps 90% of patients without diabetes below it (`high_specificity`), so few people without diabetes are told High.
+
+Both rules describe the model rather than the population, so they keep their meaning in a clinic where diabetes is more or less common than in the training data. `metadata.json` records how the bands did on the untouched test set (`low_line_recall`, `high_line_specificity`, `high_precision`, `share_low`, `share_high`).
+
+### Releasing a new version
+
+Bump `model_version` in the config (for example `clinical-v2` to `clinical-v3`) instead of overwriting a folder. The backend loads every version in `models/`, but only the highest number of each model takes new assessments. Older versions stay loaded so saved results keep the label and cut-offs they were given, and new assessments sent to them get `410 Gone`. Run the training tests with `cd training && pytest`.
+
 ## Contributing
 
 All work happens on a short-lived branch and reaches `main` through a reviewed pull request.

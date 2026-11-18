@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { createAssessment } from "./api";
-import { HINTS, MODEL_INFO, UNITS, choicesFor, defaultsFor, labelFor, modelName } from "./fields";
+import { HINTS, UNITS, choicesFor, defaultsFor, labelFor, modelBlurb, modelName } from "./fields";
 
 function validate(model, values) {
   const errors = {};
@@ -137,7 +137,7 @@ export default function AssessmentForm({ token, patient, models, onResult }) {
                 />
                 <span>
                   <strong>{modelName(m.model_version)}</strong>
-                  <small>{MODEL_INFO[m.model_version]?.blurb ?? m.model_version}</small>
+                  <small>{modelBlurb(m.model_version)}</small>
                 </span>
               </label>
             ))}

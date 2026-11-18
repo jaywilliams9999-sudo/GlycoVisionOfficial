@@ -3,7 +3,7 @@ import pandas as pd
 from sqlalchemy.orm import Session
 
 from app.db.models import Assessment
-from app.exceptions import InvalidInputs, PatientNotFound, UnknownModelVersion
+from app.exceptions import InvalidInputs, ModelReplaced, PatientNotFound, UnknownModelVersion
 from app.ml.explain import explain
 from app.ml.registry import ModelEntry
 from app.repositories import assessment_repo, patient_repo
@@ -44,6 +44,9 @@ def create_assessment(
     entry = registry.get(request.model_version)
     if entry is None:
         raise UnknownModelVersion(request.model_version)
+    if not entry.active:
+        # its cut-offs are out of date; old results keep it, new ones use the replacement
+        raise ModelReplaced(f"{request.model_version} has been replaced by {entry.replaced_by}.")
     if patient_repo.get(db, request.patient_id, clinician_id) is None:
         raise PatientNotFound(request.patient_id)
 

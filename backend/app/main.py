@@ -15,6 +15,7 @@ from app.exceptions import (
     DuplicatePatient,
     InvalidCredentials,
     InvalidInputs,
+    ModelReplaced,
     PatientNotFound,
     UnknownModelVersion,
 )
@@ -42,6 +43,7 @@ STATUS_FOR = {
     AssessmentNotFound: 404,
     UnknownModelVersion: 404,
     InvalidInputs: 422,
+    ModelReplaced: 410,
     DuplicatePatient: 409,
     InvalidCredentials: 401,
     AccountLocked: 423,

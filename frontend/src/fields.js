@@ -1,12 +1,15 @@
+// keyed by model family, so every version ("clinical-v1", "clinical-v2", ...) shares a name
 export const MODEL_INFO = {
-  "clinical-v1": { name: "Clinical", blurb: "Uses clinical/lab measurements." },
-  "screening-v1": {
+  clinical: { name: "Clinical", blurb: "Uses clinical/lab measurements." },
+  screening: {
     name: "Screening",
     blurb: "Uses health history/lifestyle answers. No lab values are needed.",
   },
 };
 
-export const modelName = (version) => MODEL_INFO[version]?.name ?? version;
+export const modelFamily = (version) => version.replace(/-v\d+$/, "");
+export const modelName = (version) => MODEL_INFO[modelFamily(version)]?.name ?? version;
+export const modelBlurb = (version) => MODEL_INFO[modelFamily(version)]?.blurb ?? version;
 
 export const LABELS = {
   // clinical-v1
